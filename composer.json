@@ -1,0 +1,15 @@
+{
+  "name": "inventivetalent/api.mcauth.ga",
+  "description": "MCAuth API",
+  "minimum-stability": "beta",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Haylee Schäfer",
+      "email": "mail@inventivetalent.org"
+    }
+  ],
+  "require": {
+    "slim/slim": "2.6.2"
+  }
+}
