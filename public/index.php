@@ -37,6 +37,12 @@ $app->group("/auth", function () use ($app) {
             exit();
         }
 
+        $existingRequest = requests()->find(array("username" => $username, "request_ip" => $ip, "status" => array('$in' => array("STARTED", "REQUESTED"))));
+        if ($existingRequest->count() > 0) {
+            echoData(array("error" => "Request with this IP <-> Username combination already exists"), 400);
+            exit();
+        }
+
         $id = hash("sha1", microtime(true) . $ip . rand() . $requestId . rand());
         $code = hash("sha256", microtime(true) . $requestId . rand() . $ip . rand() . $username . rand() . $secret);
 
