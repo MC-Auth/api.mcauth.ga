@@ -43,6 +43,11 @@ $app->group("/auth", function () use ($app) {
             exit();
         }
 
+        if (checkUsername($app, $username) === false) {
+            echoData(array("error" => "Invalid username"), 400);
+            exit();
+        }
+
         $id = hash("sha1", microtime(true) . $ip . rand() . $requestId . rand());
         $code = hash("sha256", microtime(true) . $requestId . rand() . $ip . rand() . $username . rand() . $secret);
 
@@ -224,7 +229,7 @@ $app->group("/auth", function () use ($app) {
 
         $redirectUrl = $request["request_callback"] . "?id=" . $request["_id"] . "&request_id=" . $request["request_id"] . "&code=" . $request["code"];
         if ($style === "simple") {
-            echo "You should be redirected automatically. If not <a href='$redirectUrl'>click here</a>.";
+            echo "You should be redirected automatically. If not, <a href='$redirectUrl'>click here</a>.";
             echo "<script>top.window.location = '$redirectUrl';</script>";
         } else {
             header("Location: " . $redirectUrl);
@@ -268,6 +273,36 @@ $app->group("/auth", function () use ($app) {
     });
 
 });
+
+$app->group("/util", function () use ($app) {
+
+    $app->post("/usernameCheck", function () use ($app) {
+        $username = getParam($app, "username");
+
+        $check = checkUsername($app, $username);
+        if ($check === false) {
+            echoData(array("valid" => false, "username" => $username, "uuid" => ""));
+        } else {
+            echoData(array("valid" => true, "username" => $username, "uuid" => $check));
+        }
+    });
+
+});
+
+function checkUsername($app, $username)
+{
+    $ch = curl_init("https://api.mojang.com/users/profiles/minecraft/" . $username);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $result = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    $json = json_decode($result, true);
+
+    if ($code === 204) {// Username not found
+        return false;
+    }
+    return $json["id"];
+}
 
 function getParam($app, $param)
 {
