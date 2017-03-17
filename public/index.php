@@ -67,7 +67,7 @@ $app->group("/auth", function () use ($app) {
     $app->get("/authorize/:id", function ($id) use ($app) {
         $requestId = getParam($app, "request_id");// public
         $username = getParam($app, "username");// public
-        $style = getParam($app, "style");// public (default|simple)
+        $style = $app->request()->params("style", "default");// public (default|simple)
         $ip = $app->request()->getIp();
 
         $request = requests()->find(array(
