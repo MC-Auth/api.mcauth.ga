@@ -217,6 +217,7 @@ $app->group("/auth", function () use ($app) {
         unset($_COOKIE["mcauth_id"]);
         unset($_COOKIE["mcauth_request_id"]);
         unset($_COOKIE["mcauth_username"]);
+        unset($_COOKIE["mcauth_style"]);
         session_unset();
 
         header("Location: " . $request["request_callback"] . "?id=" . $request["_id"] . "&request_id=" . $request["request_id"] . "&code=" . $request["code"]);
