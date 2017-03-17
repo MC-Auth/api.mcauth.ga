@@ -67,6 +67,7 @@ $app->group("/auth", function () use ($app) {
     $app->get("/authorize/:id", function ($id) use ($app) {
         $requestId = getParam($app, "request_id");// public
         $username = getParam($app, "username");// public
+        $style = getParam($app, "style");// public (default|simple)
         $ip = $app->request()->getIp();
 
         $request = requests()->find(array(
@@ -93,6 +94,7 @@ $app->group("/auth", function () use ($app) {
         setcookie("mcauth_id", base64_encode($id), time() + 600, "/", "mcauth.ga");
         setcookie("mcauth_request_id", base64_encode($requestId), time() + 600, "/", "mcauth.ga");
         setcookie("mcauth_username", base64_encode($username), time() + 600, "/", "mcauth.ga");
+        setcookie("mcauth_style", base64_encode($style), time() + 600, "/", "mcauth.ga");
 
         $_SESSION["auth_id"] = $id;
         $_SESSION["auth_request_id"] = $requestId;
