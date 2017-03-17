@@ -105,6 +105,7 @@ $app->group("/auth", function () use ($app) {
         $_SESSION["auth_id"] = $id;
         $_SESSION["auth_request_id"] = $requestId;
         $_SESSION["auth_username"] = $username;
+        $_SESSION["auth_style"] = $style;
 
         // update status
         requests()->update(array("_id" => $id), array('$set' => array("status" => "REQUESTED")));
