@@ -214,13 +214,21 @@ $app->group("/auth", function () use ($app) {
             exit();
         }
 
+        $style = $_COOKIE["mcauth_style"];
+
         unset($_COOKIE["mcauth_id"]);
         unset($_COOKIE["mcauth_request_id"]);
         unset($_COOKIE["mcauth_username"]);
         unset($_COOKIE["mcauth_style"]);
         session_unset();
 
-        header("Location: " . $request["request_callback"] . "?id=" . $request["_id"] . "&request_id=" . $request["request_id"] . "&code=" . $request["code"]);
+        $redirectUrl = $request["request_callback"] . "?id=" . $request["_id"] . "&request_id=" . $request["request_id"] . "&code=" . $request["code"];
+        if ($style === "simple") {
+            echo "You should be redirected automatically. If not <a href='$redirectUrl'>click here</a>.";
+            echo "<script>top.window.location = '$redirectUrl';</script>";
+        } else {
+            header("Location: " . $redirectUrl);
+        }
         exit();
     });
 
