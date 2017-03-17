@@ -94,7 +94,7 @@ $app->group("/auth", function () use ($app) {
         setcookie("mcauth_id", base64_encode($id), time() + 600, "/", "mcauth.ga");
         setcookie("mcauth_request_id", base64_encode($requestId), time() + 600, "/", "mcauth.ga");
         setcookie("mcauth_username", base64_encode($username), time() + 600, "/", "mcauth.ga");
-        setcookie("mcauth_style", base64_encode($style), time() + 600, "/", "mcauth.ga");
+        setcookie("mcauth_style", $style, time() + 600, "/", "mcauth.ga");
 
         $_SESSION["auth_id"] = $id;
         $_SESSION["auth_request_id"] = $requestId;
