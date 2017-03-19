@@ -289,6 +289,12 @@ $app->group("/util", function () use ($app) {
 
 });
 
+$app->get("/status", function () use ($app) {
+    echoData(array(
+        "pendingRequests" => requests()->count()
+    ));
+});
+
 function checkUsername($app, $username)
 {
     $ch = curl_init("https://api.mojang.com/users/profiles/minecraft/" . $username);
