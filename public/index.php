@@ -51,7 +51,7 @@ $app->group("/auth", function () use ($app) {
         $id = hash("sha1", microtime(true) . $ip . rand() . $requestId . rand());
         $code = hash("sha256", microtime(true) . $requestId . rand() . $ip . rand() . $username . rand() . $secret);
 
-        requests()->insert(array(
+        $request = array(
             "_id" => $id,
             "code" => $code,
             "request_id" => $requestId,
@@ -61,6 +61,19 @@ $app->group("/auth", function () use ($app) {
             "username" => $username,
             "status" => "STARTED",
             "created" => new MongoDate(time())
+        );
+        requests()->insert($request);
+
+        auth_log()->insert(array(
+            "_id" => $id,
+            "time" => array(
+                "start" => new MongoDate(time()),
+                "authorize" => false,
+                "verify" => false,
+                "finish" => false,
+                "statusCheck" => false
+            ),
+            "request" => $request
         ));
 
         echoData(array(
@@ -114,6 +127,11 @@ $app->group("/auth", function () use ($app) {
 
         // update status
         requests()->update(array("_id" => $id), array('$set' => array("status" => "REQUESTED")));
+        auth_log()->update(array("_id" => $id),
+            array('$set' => array(
+                "time.authorize" => new MongoDate(time()),
+                "request.status" => "REQUESTED"
+            )));
 
         header("Location: https://mcauth.ga/#/auth");
         exit();
@@ -185,6 +203,13 @@ $app->group("/auth", function () use ($app) {
                     "id" => $id,
                     "status" => "INVALID_TOKEN"
                 ));
+
+                auth_log()->update(array("_id" => $id),
+                    array('$set' => array(
+                        "time.verify" => new MongoDate(time()),
+                        "request.status" => "INVALID_TOKEN"
+                    )));
+
                 exit();
             } else {
                 requests()->update(array("_id" => $id), array('$set' => array("status" => "VERIFIED")));
@@ -192,6 +217,14 @@ $app->group("/auth", function () use ($app) {
                     "id" => $id,
                     "status" => "VERIFIED"
                 ));
+
+                auth_log()->update(array("_id" => $id),
+                    array('$set' => array(
+                        "time.verify" => new MongoDate(time()),
+                        "request.status" => "VERIFIED"
+                    )));
+
+                exit();
             }
         });
 
@@ -226,6 +259,11 @@ $app->group("/auth", function () use ($app) {
         unset($_COOKIE["mcauth_username"]);
         unset($_COOKIE["mcauth_style"]);
         session_unset();
+
+        auth_log()->update(array("_id" => $id),
+            array('$set' => array(
+                "time.finish" => new MongoDate(time())
+            )));
 
         $redirectUrl = $request["request_callback"] . "?id=" . $request["_id"] . "&request_id=" . $request["request_id"] . "&code=" . $request["code"];
         if ($style === "simple") {
@@ -263,6 +301,11 @@ $app->group("/auth", function () use ($app) {
             echoData(array("error" => "Code mismatch"), 400);
             exit();
         }
+
+        auth_log()->update(array("_id" => $id),
+            array('$set' => array(
+                "time.statusCheck" => new MongoDate(time())
+            )));
 
         echoData(array(
             "id" => $id,

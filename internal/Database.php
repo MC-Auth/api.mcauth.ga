@@ -48,3 +48,9 @@ function oauth_requests()
     $db = db();
     return $db->oauth_requests;
 }
+
+function auth_log()
+{
+    $db = db();
+    return $db->auth_log;
+}
