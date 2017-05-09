@@ -1,4 +1,6 @@
 <?php
+use xPaw\MinecraftPing;
+
 session_start();
 
 require "../vendor/autoload.php";
@@ -328,6 +330,24 @@ $app->group("/util", function () use ($app) {
         } else {
             echoData(array("valid" => true, "username" => $username, "uuid" => $check));
         }
+    });
+
+    $app->get("/serverStatus", function () use ($app) {
+        $info = array(
+            "online" => false
+        );
+        try {
+            $serverPing = new MinecraftPing("mc.mcauth.ga");
+            $info = $serverPing->Query();
+            $info["online"] = count($info["favicon"]) > 0;
+        } catch (Exception $e) {
+            $info["online"] = false;
+            $info["exception"] = array(
+                "code" => $e->getCode(),
+                "message" => $e->getMessage()
+            );
+        }
+        echoData($info);
     });
 
 });
