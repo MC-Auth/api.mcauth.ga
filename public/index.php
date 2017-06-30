@@ -312,6 +312,8 @@ $app->group("/auth", function () use ($app) {
         echoData(array(
             "id" => $id,
             "request_id" => $requestId,
+            "username" => $request["username"],
+            "uuid" => $request["uuid"],
             "status" => $request["status"] === "VERIFIED" ? "VERIFIED" : "NOT_VERIFIED",
             "fail_reason" => $request["status"] === "VERIFIED" ? "" : $request["status"]
         ));
