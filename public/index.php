@@ -112,10 +112,10 @@ $app->group("/auth", function () use ($app) {
             echoData(array("error" => "Username mismatch"), 400);
             exit();
         }
-        if ($request["request_ip"] !== $ip) {
-            echoData(array("error" => "IP mismatch ($ip)"), 400);
-            exit();
-        }
+//        if ($request["request_ip"] !== $ip) {
+//            echoData(array("error" => "IP mismatch (y:$ip r:".$request["request_ip"].")"), 400);
+//            exit();
+//        }
 
         setcookie("mcauth_id", base64_encode($id), time() + 600, "/", "mcauth.ga");
         setcookie("mcauth_request_id", base64_encode($requestId), time() + 600, "/", "mcauth.ga");
