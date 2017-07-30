@@ -270,7 +270,7 @@ $app->group("/auth", function () use ($app) {
         $redirectUrl = $request["request_callback"] . "?id=" . $request["_id"] . "&request_id=" . $request["request_id"] . "&code=" . $request["code"];
         if ($style === "simple") {
             echo "You should be redirected automatically. If not, <a href='$redirectUrl'>click here</a>.";
-            echo "<script>top.window.location = '$redirectUrl';</script>";
+            echo "<script>window.location = '$redirectUrl';</script>";
         } else {
             header("Location: " . $redirectUrl);
         }
@@ -379,7 +379,7 @@ function getParam($app, $param)
 {
     $value = $app->request()->params($param);
     if (!isset($value) || empty($value)) {
-        echoData(array("error" => "Missing parameter: " . $param), 400);
+        echoData(array("error" => "Missing parameter: " . $param,"params"=>$app->request()->params()), 400);
         exit();
     }
     return $value;
